@@ -21,8 +21,8 @@ while True:
         break
 
     dst = cv2.flip(src, 1)                # 左右反転
-    dst = cv2.stylization(src)            # イラスト風
-    gray, dst = cv2.pencilSketch(src)     # 鉛筆画風
+    #dst = cv2.stylization(src)            # イラスト風
+    #gray, dst = cv2.pencilSketch(src)     # 鉛筆画風
 
     # 入力と出力を1フレーム表示
     cv2.imshow('win_src', src)
