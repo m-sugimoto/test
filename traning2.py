@@ -1,41 +1,53 @@
 import cv2
 
-img = cv2.imread('/Users/sugimotomamoru/python/glasspicture/1608088589000.jpg')
-
-cascade_file = 'haarcascade_frontalface_alt.xml'
-cascade = cv2.CascadeClassifier(cascade_file)
-
-gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-face_list = cascade.detectMultiScale(gray,
-                                    scaleFactor=1.11,
-                                    minNeighbors = 5,
-                                    minSize =(128,128))
-                                    #flag = cv2.CASCADE_SCALE_IMAGE)
-
-color = (0,0,255)
-
-#if len(face_list) > 0:
-
-for face in face_list:
-  x,y,w,h = face
-  cv2.rectangle(img,(x,y),(x+w,y+h),color,thickness=2)
+def draw_grid(img, num):
+    """ グリッド模様とフレーム数を描画 """
+    for x in range(30, img.shape[1], 30):
+        for y in range(30, img.shape[0], 30):
+            cv2.circle(img, (x, y), 1, (255, 255, 255))
+    cv2.putText(img, str(num), (20, 40),
+                cv2.FONT_HERSHEY_PLAIN, 3,
+                (255, 255, 255), 2)
+    return img
 
 
-#return img
+# カメラ入力映像
+cap = cv2.VideoCapture(0)
+# カメラ入力映像の幅と高さのサイズ
+frame_size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
+              int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+# ビデオ出力ファイル設定
+rec = cv2.VideoWriter('data/komadori.mp4', cv2.VideoWriter_fourcc(*'H264'),
+                      5, frame_size)
 
-#cap = cv2.VideoCapture(1)
+print('Space key: Write frame, Esc key: Exit')
+count = 0
 
-#while True:
-  #ret, frame = cap.read()
+while True:
+    # 現在フレームを取得
+    _, src = cap.read()
 
-  #img = Face_Cut(frame)
+    if count > 0:
+        # 現在フレームと前フレームを半々で合成
+        dst = cv2.addWeighted(src, 0.5, prev, 0.5, 0)
+    else:
+        dst = src
 
-  #cv2.imshow('Frame', img)
+    # グリッド模様とフレーム数を描画
+    dst = draw_grid(dst, count)
+    cv2.imshow('win_dst', dst)
+    key = cv2.waitKey(30)
 
-  #k = cv2.waitKey(1)
-  #if k == 27:
-   #  break
+    # スペースキーを押したとき
+    if key == ord(' '):
+       
+        # 1フレーム書き込み
+        rec.write(src)
+        # 現在フレームを前フレームに複製
+        #prev = src.copy()
+        #count += 1
+    #elif key == 27:
+        break
 
-cap.release()
 cv2.destroyAllWindows()
+#rec.release()
