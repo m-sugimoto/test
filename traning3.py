@@ -12,6 +12,9 @@ cv2.namedWindow('win_dst', cv2.WINDOW_NORMAL)
 # ウィンドウサイズを変更
 cv2.resizeWindow('win_dst', 800, 600)
 
+rec = cv2.VideoWriter('data/traning3.mp4', cv2.VideoWriter_fourcc(*'H264'),
+                      5)
+
 # ループ開始
 while True:
     # 1フレーム読み込み
@@ -27,7 +30,17 @@ while True:
     # 入力と出力を1フレーム表示
     cv2.imshow('win_src', src)
     cv2.imshow('win_dst', dst)
+    key = cv2.waitKey(30)
     if cv2.waitKey(10) == 27:
+        break
+
+    if key == ord(' '):
+        # 1フレーム書き込み
+        rec.write(src)
+        # 現在フレームを前フレームに複製
+        prev = src.copy()
+        count += 1
+    elif key == 27:
         break
 
 cv2.destroyAllWindows()

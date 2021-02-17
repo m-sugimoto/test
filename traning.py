@@ -1,11 +1,27 @@
 import cv2
-img1 = cv2.imread('/Users/sugimotomamoru/python/glasspicture/DSC_0022.JPG')
-img2 = cv2.imread('/Users/sugimotomamoru/python/glasspicture/1608088589000.jpg')
+import os
 
-img1 = cv2.resize(img1, img2.shape[1::-1])
+def save_frame_camera_key(device_num, dir_path, basename, ext='jpg', delay=1, window_name='frame'):
+    cap = cv2.VideoCapture(device_num)
 
-img = cv2.addWeighted(img1, 0.5, img2, 0.5, 0)
+    if not cap.isOpened():
+        return
 
-cv2.imshow('image', img)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+    os.makedirs(dir_path, exist_ok=True)
+    base_path = os.path.join(dir_path, basename)
+
+    n = 0
+    while True:
+        ret, frame = cap.read()
+        cv2.imshow(window_name, frame)
+        key = cv2.waitKey(delay) & 0xFF
+        if key == ord('c'):
+            cv2.imwrite('{}_{}.{}'.format(base_path, n, ext), frame)
+            n += 1
+        elif key == ord('q'):
+            break
+
+    cv2.destroyWindow(window_name)
+
+
+save_frame_camera_key(0, 'data/temp', 'camera_capture')
